@@ -1,0 +1,12 @@
+[project]
+name = "wb-parser"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "beautifulsoup4>=4.13.4",
+    "httpx>=0.28.1",
+    "py-mini-racer>=0.6.0",
+    "pydantic>=2.11.4",
+]
