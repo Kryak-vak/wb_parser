@@ -16,7 +16,7 @@ def ensure_status(expected_status: int = 200, log: bool = False):
         @wraps(request_func)
         async def wrapper(*args, **kwargs):
             if log:
-                print(f'{request_func.__name__}({args[1:] = }) starting')
+                print(f'{request_func.__name__}({args[1:]}) starting')
             
             r: httpx.Response = await request_func(*args, **kwargs)
             if r.status_code != expected_status:
@@ -53,10 +53,10 @@ class WBParser:
         await self.client.aclose()
     
     async def run(self):
-        tasks = [self.parse_item(url) for url in self.item_urls]
+        tasks = [self.parse_item_cycle(url) for url in self.item_urls]
         await asyncio.gather(*tasks)
     
-    async def parse_item(self, item_url: URL):
+    async def parse_item_cycle(self, item_url: URL) -> None:
         r = await self.get_item_page(item_url)
         item_page_html = r.text
         
@@ -73,7 +73,7 @@ class WBParser:
 
         key_request = self.form_key_request(item_card)
         r = await self.get_item_search(key_request)
-        placement = self.find_item_placement(r.json(), item_nm_id)
+        placement = self.find_item_placement(r.json(), item_card.nm_id)
 
         item_card.key_requests[key_request] = placement
         self.item_cards.append(item_card)
@@ -160,7 +160,7 @@ class WBParser:
             return -1
         
         products = data_full['data']['products']
-        placement = next((i for i, p in enumerate(products) if p["id"] == nm_id), -1) + 1
+        placement = next((i for i, p in enumerate(products) if p["id"] == nm_id), -2) + 1
 
         return placement
 
